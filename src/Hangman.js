@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import "./Hangman.css";
+import {randomWord} from './words.js'
 import img0 from "./0.jpg";
 import img1 from "./1.jpg";
 import img2 from "./2.jpg";
@@ -17,9 +18,19 @@ class Hangman extends Component{
     constructor(props){
         super(props)
         this.state = {
-            nWrong: 0, guessed: new Set(), answer: "africa"
+            nWrong: 0, guessed: new Set(), answer: randomWord()
         }
         this.handleGuess = this.handleGuess.bind(this)
+        this.reset = this.reset.bind(this)
+    }
+
+    reset(){
+        // Change word
+        // Num guesses
+        // Guessed empty
+        this.setState({
+            nWrong: 0, guessed: new Set(), answer: randomWord()
+        })
     }
 
     generateKeys(){
@@ -27,6 +38,7 @@ class Hangman extends Component{
 
         return letters.split("").map(ltr => (
             <button
+                key={ltr}
                 value={ltr}
                 onClick = {this.handleGuess}
                 disabled = {this.state.guessed.has(ltr)}
@@ -36,10 +48,24 @@ class Hangman extends Component{
         ));
     }
 
+    /** generateButtons: return array of letter buttons to render */
+  generateButtons() {
+    return "abcdefghijklmnopqrstuvwxyz".split("").map(ltr => (
+      <button
+        key={ltr}
+        value={ltr}
+        onClick={this.handleGuess}
+        disabled={this.state.guessed.has(ltr)}
+      >
+        {ltr}
+      </button>
+    ));
+  }
+
     guessedWord(){
         //returning each individual letter
         return this.state.answer.split("").map(ltr => (
-            this.state.guessed.has(ltr) ? {ltr} : "_"
+            this.state.guessed.has(ltr) ? ltr : "_"
         ));
     }
 
@@ -52,18 +78,21 @@ class Hangman extends Component{
         }));
     }
 
-    
-
-    
 
     render(){
-
+        const gameOver = this.state.nWrong >= this.props.maxWrong;
+        const isWinner = this.guessedWord().join("") === this.state.answer
+        let gameState = this.generateButtons();
+        if(isWinner) gameState = "You Win!"
+        if(gameOver) gameState = "Sorry, You lose!"
         return(
-            <div>
+            <div className="Hangman">
                 <h1>Hangman</h1>
-                <img src={this.props.imgages[this.state.nWrong]} alt="hangman image" />
-                <p>{this.generateKeys()}</p>
-                <p></p>
+                <img src={this.props.imgages[this.state.nWrong]} alt="hangman" />
+                <p>Guessed wrong: {this.state.nWrong}</p>
+                <p className="guessedWord Hangman-word">{!gameOver ? this.guessedWord() : this.state.answer }</p>
+                <p>{gameState}</p>
+                <button id="reset" onClick={this.reset}>New Game</button>
             </div>
         )
     }
