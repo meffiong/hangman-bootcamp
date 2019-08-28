@@ -76,3 +76,7 @@
     background: #7b1fa2;
   }
   
+  @media screen and ( max-width: 600px ) and ( min-width: 200px ) {
+    .Hangman-word { margin: 0.4em 0em 0.2em 0; }
+
+  }
